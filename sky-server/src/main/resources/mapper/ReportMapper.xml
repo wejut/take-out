@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sky.mapper.ReportMapper">
+
+
+    <select id="countUserIdByDate" resultType="java.lang.Integer">
+        select count(id) from user
+        <where>
+            <if test="dayMax !=null">
+                and create_time &lt; #{dayMax}
+            </if>
+            <if test="dayMin !=null">
+                and create_time &gt; #{dayMin}
+            </if>
+        </where>
+    </select>
+
+    <select id="countOrdersByDateAndStatusDynamically" resultType="java.lang.Integer">
+        select count(id) from Orders
+        <where>
+            <if test="dayMax !=null">
+                and order_time &lt; #{dayMax}
+            </if>
+            <if test="dayMin !=null">
+                and order_time &gt; #{dayMin}
+            </if>
+            <if test="status !=null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+    <select id="getTop10ByDate" resultType="java.util.Map">
+        select od.name, sum(od.number) from order_detail od left join orders o on od.order_id= o.id
+            where o.status = 5
+            <if test="Max !=null">
+                and o.order_time &lt; #{Max}
+            </if>
+            <if test="Min !=null">
+                and o.order_time &gt; #{Min}
+            </if>
+        group by od.name
+        order by sum(od.number) desc
+        limit 0,10
+    </select>
+</mapper>
